@@ -1,8 +1,9 @@
 package com.grassroots.entity;
 
 public enum AgeGroup {
-    UNDER_16,
-    UNDER_19,
-    UNDER_23,
+    U16,
+    U17,
+    U19,
+    U23,
     SENIOR
 }

@@ -41,7 +41,7 @@ public class SearchService {
             } catch (IllegalArgumentException e) {
                 throw new IllegalArgumentException(
                         "Invalid ageGroup value: '" + ageGroup +
-                        "'. Valid values: UNDER_16, UNDER_19, UNDER_23, SENIOR");
+                        "'. Valid values: U16, U17, U19, U23, SENIOR");
             }
         }
 

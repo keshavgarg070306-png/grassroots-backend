@@ -5,7 +5,9 @@ import com.grassroots.dto.ShortlistResponse;
 import com.grassroots.entity.Athlete;
 import com.grassroots.entity.Shortlist;
 import com.grassroots.entity.User;
+import com.grassroots.entity.Notification;
 import com.grassroots.repository.AthleteRepository;
+import com.grassroots.repository.NotificationRepository;
 import com.grassroots.repository.ShortlistRepository;
 import com.grassroots.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -23,6 +25,7 @@ public class ShortlistService {
     private final ShortlistRepository shortlistRepository;
     private final AthleteRepository   athleteRepository;
     private final UserRepository      userRepository;
+    private final NotificationRepository notificationRepository;
 
     public ShortlistResponse addToShortlist(Long athleteId, ShortlistRequest request) {
         User scout   = currentUser();
@@ -39,7 +42,17 @@ public class ShortlistService {
                 .note(request != null ? request.getNote() : null)
                 .build();
 
-        return toResponse(shortlistRepository.save(entry));
+        Shortlist savedEntry = shortlistRepository.save(entry);
+
+        // Notify the Athlete
+        notificationRepository.save(Notification.builder()
+                .user(athlete.getUser())
+                .title("New Scout Interest")
+                .message("A Senior Scout has added you to their Shortlist.")
+                .type("SHORTLIST")
+                .build());
+
+        return toResponse(savedEntry);
     }
 
     @Transactional
@@ -56,6 +69,23 @@ public class ShortlistService {
         return shortlistRepository.findByScoutId(scout.getId())
                 .stream()
                 .map(this::toResponse)
+                .toList();
+    }
+
+    public List<ShortlistResponse> getScoutsWhoShortlistedMe() {
+        User athleteUser = currentUser();
+        Athlete athlete = athleteRepository.findByUserEmail(athleteUser.getEmail())
+                .orElseThrow(() -> new RuntimeException("Athlete profile not found"));
+        
+        return shortlistRepository.findByAthleteId(athlete.getId())
+                .stream()
+                .map(s -> ShortlistResponse.builder()
+                        .shortlistId(s.getId())
+                        .shortlistedAt(s.getCreatedAt())
+                        .athleteId(athlete.getId())
+                        .athleteName(s.getScout().getName()) // Using athleteName field for Scout Name in this context
+                        .sport("Scout Connection")
+                        .build())
                 .toList();
     }
 

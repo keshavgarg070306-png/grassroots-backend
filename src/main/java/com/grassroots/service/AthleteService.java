@@ -5,11 +5,14 @@ import com.grassroots.dto.AthleteProfileResponse;
 import com.grassroots.entity.Athlete;
 import com.grassroots.entity.User;
 import com.grassroots.repository.AthleteRepository;
+import com.grassroots.repository.PerformanceMetricRepository;
 import com.grassroots.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,6 +20,7 @@ public class AthleteService {
 
     private final AthleteRepository athleteRepository;
     private final UserRepository userRepository;
+    private final PerformanceMetricRepository metricRepository;
 
     public AthleteProfileResponse createOrUpdateProfile(AthleteProfileRequest request) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
@@ -57,6 +61,14 @@ public class AthleteService {
     }
 
     private AthleteProfileResponse toResponse(Athlete athlete) {
+        var metrics = metricRepository.findByAthleteOrderByTimestampDesc(athlete).stream()
+                .map(m -> AthleteProfileResponse.MetricDTO.builder()
+                        .type(m.getMetricType())
+                        .value(m.getMetricValue())
+                        .timestamp(m.getTimestamp())
+                        .build())
+                .collect(Collectors.toList());
+
         return AthleteProfileResponse.builder()
                 .id(athlete.getId())
                 .userId(athlete.getUser().getId())
@@ -71,7 +83,9 @@ public class AthleteService {
                 .photoUrl(athlete.getPhotoUrl())
                 .latitude(athlete.getLatitude())
                 .longitude(athlete.getLongitude())
+                .metrics(metrics)
                 .createdAt(athlete.getCreatedAt())
                 .build();
     }
 }
+

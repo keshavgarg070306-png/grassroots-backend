@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: grassroots-backend
+    env: docker
+    region: oregon
+    plan: free
+    healthCheckPath: /
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: PORT
+        value: 8080
+      - key: DATABASE_URL
+        fromDatabase:
+          name: grassroots-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_URL
+        value: jdbc:postgresql://${DATABASE_URL}
+      - key: JWT_SECRET
+        generateValue: true
+
+databases:
+  - name: grassroots-db
+    databaseName: grassroots
+    user: grassroots_user
+    region: oregon
+    plan: free

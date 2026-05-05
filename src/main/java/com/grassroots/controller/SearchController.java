@@ -25,7 +25,7 @@ public class SearchController {
     /**
      * Paginated athlete search with optional filters.
      *
-     * GET /api/search/athletes?sport=Football&state=Maharashtra&ageGroup=UNDER_19&page=0&size=12
+     * GET /api/search/athletes?sport=Football&state=Maharashtra&ageGroup=U19&page=0&size=12
      */
     @GetMapping("/athletes")
     public ResponseEntity<Page<AthleteSearchResponse>> searchAthletes(

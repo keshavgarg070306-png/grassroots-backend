@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/scout/shortlist")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('SCOUT')")
 @Tag(name = "Shortlist", description = "Scout shortlist management")
 @SecurityRequirement(name = "bearerAuth")
 public class ShortlistController {
@@ -24,6 +23,7 @@ public class ShortlistController {
     private final ShortlistService shortlistService;
 
     @PostMapping("/{athleteId}")
+    @PreAuthorize("hasRole('SCOUT')")
     @Operation(summary = "Add an athlete to the scout's shortlist")
     public ResponseEntity<ShortlistResponse> addToShortlist(
             @PathVariable Long athleteId,
@@ -33,6 +33,7 @@ public class ShortlistController {
     }
 
     @DeleteMapping("/{athleteId}")
+    @PreAuthorize("hasRole('SCOUT')")
     @Operation(summary = "Remove an athlete from the scout's shortlist")
     public ResponseEntity<Void> removeFromShortlist(@PathVariable Long athleteId) {
         shortlistService.removeFromShortlist(athleteId);
@@ -40,8 +41,16 @@ public class ShortlistController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('SCOUT')")
     @Operation(summary = "Get all shortlisted athletes for the current scout")
     public ResponseEntity<List<ShortlistResponse>> getMyShortlist() {
         return ResponseEntity.ok(shortlistService.getMyShortlist());
+    }
+
+    @GetMapping("/athlete")
+    @PreAuthorize("hasRole('ATHLETE')")
+    @Operation(summary = "Get all scouts who shortlisted the current athlete")
+    public ResponseEntity<List<ShortlistResponse>> getScoutsWhoShortlistedMe() {
+        return ResponseEntity.ok(shortlistService.getScoutsWhoShortlistedMe());
     }
 }
