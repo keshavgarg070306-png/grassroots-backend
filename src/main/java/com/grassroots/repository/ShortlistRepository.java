@@ -11,6 +11,7 @@ import java.util.Optional;
 public interface ShortlistRepository extends JpaRepository<Shortlist, Long> {
 
     List<Shortlist> findByScoutId(Long scoutId);
+    List<Shortlist> findByAthleteId(Long athleteId);
 
     Optional<Shortlist> findByScoutIdAndAthleteId(Long scoutId, Long athleteId);
 

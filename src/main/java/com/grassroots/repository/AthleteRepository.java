@@ -16,6 +16,7 @@ import java.util.Optional;
 public interface AthleteRepository extends JpaRepository<Athlete, Long> {
 
     Optional<Athlete> findByUserId(Long userId);
+    Optional<Athlete> findByUserEmail(String email);
 
     /**
      * Optional multi-filter search. A null value for any param disables that filter.
